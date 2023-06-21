@@ -1,0 +1,121 @@
+create table game (
+	game_id INT,
+	name varchar(20),
+	author varchar(20),
+	publisher varchar(20),
+	genre varchar(20),
+	game_condition varchar(20),
+	quantity INT,
+	primary key(game_id)
+);
+
+create table customer (
+	customer_id INT,
+	first_name varchar(20),
+	last_name varchar(20),
+	registration_date date,
+	primary key(customer_id)
+);
+
+create table rent (
+	rent_id INT,
+	game_id INT,
+	last_rent date,
+	employee_id INT,
+	customer_id INT,
+	comments VARCHAR(50),
+	primary key(rent_id),
+	FOREIGN KEY (game_id) REFERENCES game(game_id) ON DELETE SET null,
+	FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE SET null
+);
+
+create table employee (
+	employee_id INT,
+	first_name varchar(20),
+	last_name varchar(20),
+	employment_date DATE,
+	primary key(employee_id)
+);
+
+create table loyalty_program (
+	card_id INT, 
+	customer_id INT,
+	points INT,
+	primary key(card_id),
+	FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE SET null
+);
+
+-- populate table GAME
+insert into game values(1, 'Scythe', 'Jamey Stegmaier', 'Phalanx Games', 'Strategy', 'Good', 3);
+insert into game values(2, 'Dooble', 'Denis Blanchot', 'Rebel', 'Party', 'Average', 5);
+insert into game values(3, 'Tortuga 2199', 'Michael Loyko', 'Phalanx Games', 'Strategy', 'Very good', 1);
+insert into game values(4, 'Monopoly', NULL, 'Hasbro', 'Euro', 'Good', 3);
+insert into game values(5, 'Talisman', 'Robert Harris', 'Games Workshop', 'Adventure', 'Average', 3);
+insert into game values(6, 'Talisman', 'Robert Harris', 'Games Workshop', 'Adventure', 'Very good', 1);
+
+select *
+from game;
+
+-- populate table CUSTOMER
+insert into customer values(1, 'Paweł', 'Kozioł', '2020-05-11');
+insert into customer values(2, 'Arkadiusz', 'Czerepach', '2021-02-15');
+insert into customer values(3, 'Lucy', 'Wilska', '2023-01-23');
+insert into customer values(4, 'Klaudia', 'Kozioł', '2022-07-21');
+insert into customer values(5, 'Jakub', 'Kusy', '2023-11-29');
+
+select *
+from customer;
+
+-- populate table EMPLOYEE
+alter table employee add pay INT;
+insert into employee values(1, 'Fabian', 'Duda', '2019-12-30');
+insert into employee values(2, 'Leokadia', 'Paciorek', '2020-01-12');
+insert into employee values(3, 'Szymon', 'Solejuk', '2022-11-02');
+
+update employee 
+set pay = 4000
+where employee_id = 1;
+
+select *
+from employee;
+
+-- populate table RENT 
+insert into rent values(1, 3, '2022-11-16', 1, 4, 'No comments.');
+insert into rent values(2, 1, '2022-03-19', 1, 1, 'Crumpled cards');
+insert into rent values(3, 5, '2023-03-01', 3, 2, 'Missing die');
+insert into rent values(4, 3, '2021-01-30', 2, 5, null);
+insert into rent values(5, 2, '2022-03-19', 1, 3, 'Missing cards');
+
+select *
+from rent;
+
+-- populate loyality_program
+insert into loyalty_program values(1,1,200);
+insert into loyalty_program values(2,4,1200);
+insert into loyalty_program values(3,2,0);
+insert into loyalty_program values(4,5,50);
+
+select *
+from loyalty_program;
+
+-- sample queries
+select first_name, last_name, registration_date 
+from customer 
+where registration_date > '2022-01-01';
+
+select card_id, first_name, last_name, points
+from loyalty_program
+join customer
+on  loyalty_program.customer_id = customer.customer_id;
+
+select distinct(game_condition)
+from game;
+
+select rent.last_rent, rent.game_id, customer.last_name
+from rent 
+join customer 
+on customer.customer_id = rent.customer_id
+where last_rent > '2023-01-01';
+
+select count(distinct name) as 'Liczba tytułów w wyporzyczalni'
+from game;
